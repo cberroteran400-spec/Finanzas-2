@@ -1,0 +1,56 @@
+# Dependencias
+node_modules/
+.npm/
+.pnpm-store/
+
+# Capacitor / Android generado
+android/
+ios/
+
+# Builds
+dist/
+build/
+*.apk
+*.aab
+*.apks
+
+# Gradle
+.gradle/
+**/.gradle/
+local.properties
+*.iml
+
+# Android Studio / IntelliJ
+.idea/
+*.iws
+*.ipr
+*.ids
+*.class
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Archivos temporales
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# Variables de entorno
+.env
+.env.*
+!.env.example
+
+# Cobertura / cachés
+coverage/
+.cache/

@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Controla - Finanzas Personales</title>
+
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --card: #ffffff;
+      --text: #17202a;
+      --muted: #718096;
+      --border: #e5e9ef;
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --income: #16a34a;
+      --income-bg: #ecfdf3;
+      --expense: #dc2626;
+      --expense-bg: #fef2f2;
+      --danger: #dc2626;
+      --shadow: 0 8px 30px rgba(15, 23, 42, 0.07);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Helvetica,
+        Arial,
+        sans-serif;
+      min-height: 100vh;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 18px 16px 40px;
+    }
+
+    /* Encabezado */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+    }
+
+    .brand-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: var(--primary);
+      color: white;
+      font-size: 23px;
+      box-shadow: 0 7px 18px rgba(37, 99, 235, 0.25);
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.1;
+      letter-spacing: -0.5px;
+    }
+
+    .brand p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* Resumen */
+    .balance-card {
+      background: linear-gradient(145deg, #111827, #1e293b);
+      color: white;
+      border-radius: 24px;
+      padding: 22px;
+      margin-bottom: 14px;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.18);
+    }
+
+    .balance-label {
+      font-size: 13px;
+      color: #cbd5e1;
+      margin-bottom: 7px;
+    }
+
+    .balance-value {
+      font-size: clamp(30px, 9vw, 42px);
+      font-weight: 800;
+      letter-spacing: -1.3px;
+      overflow-wrap: anywhere;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .summary-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+      min-width: 0;
+    }
+
+    .summary-top {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .summary-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      font-size: 15px;
+    }
+
+    .summary-icon.income {
+      background: var(--income-bg);
+      color: var(--income);
+    }
+
+    .summary-icon.expense {
+      background: var(--expense-bg);
+      color: var(--expense);
+    }
+
+    .summary-value {
+      font-size: 19px;
+      font-weight: 750;
+      overflow-wrap: anywhere;
+    }
+
+    .income-text {
+      color: var(--income);
+    }
+
+    .expense-text {
+      color: var(--expense);
+    }
+
+    /* Formulario */
+    .section-title {
+      font-size: 19px;
+      font-weight: 750;
+      margin: 0 0 13px;
+      letter-spacing: -0.3px;
+    }
+
+    .form-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 17px;
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+    }
+
+    .type-selector {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      background: #f1f5f9;
+      padding: 5px;
+      border-radius: 13px;
+      margin-bottom: 15px;
+    }
+
+    .type-btn {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      border-radius: 10px;
+      padding: 11px 8px;
+      font-weight: 700;
+      transition: 0.2s ease;
+    }
+
+    .type-btn.active.income {
+      background: white;
+      color: var(--income);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    }
+
+    .type-btn.active.expense {
+      background: white;
+      color: var(--expense);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    }
+
+    .field {
+      margin-bottom: 13px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 13px;
+      font-weight: 650;
+      color: #475569;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      min-height: 48px;
+      border: 1px solid var(--border);
+      background: #fafbfc;
+      color: var(--text);
+      border-radius: 13px;
+      padding: 0 13px;
+      outline: none;
+      transition: 0.2s ease;
+      appearance: auto;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      border-color: var(--primary);
+      background: white;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
+    }
+
+    .amount-wrapper {
+      position: relative;
+    }
+
+    .amount-prefix {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-weight: 700;
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    #amount {
+      padding-left: 34px;
+      font-weight: 650;
+    }
+
+    .add-btn {
+      width: 100%;
+      min-height: 51px;
+      border: none;
+      border-radius: 14px;
+      background: var(--primary);
+      color: white;
+      font-weight: 750;
+      font-size: 15px;
+      margin-top: 3px;
+      box-shadow: 0 7px 17px rgba(37, 99, 235, 0.22);
+      transition: transform 0.12s ease, background 0.2s ease;
+    }
+
+    .add-btn:active {
+      transform: scale(0.98);
+    }
+
+    .add-btn:hover {
+      background: var(--primary-dark);
+    }
+
+    .error {
+      display: none;
+      margin: 0 0 12px;
+      background: var(--expense-bg);
+      color: var(--expense);
+      border-radius: 11px;
+      padding: 10px 12px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .error.show {
+      display: block;
+    }
+
+    /* Historial */
+    .history-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .clear-btn {
+      border: none;
+      background: transparent;
+      color: var(--danger);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 7px;
+      border-radius: 8px;
+    }
+
+    .clear-btn:active {
+      background: var(--expense-bg);
+    }
+
+    .filters {
+      display: flex;
+      gap: 7px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      margin-bottom: 13px;
+    }
+
+    .filters::-webkit-scrollbar {
+      display: none;
+    }
+
+    .filter-btn {
+      flex: 0 0 auto;
+      border: 1px solid var(--border);
+      background: white;
+      color: var(--muted);
+      padding: 9px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .filter-btn.active {
+      background: var(--text);
+      color: white;
+      border-color: var(--text);
+    }
+
+    .movement-list {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    .movement {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 13px;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      box-shadow: 0 3px 12px rgba(15, 23, 42, 0.035);
+    }
+
+    .movement-icon {
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
+      border-radius: 13px;
+      display: grid;
+      place-items: center;
+      font-size: 20px;
+    }
+
+    .movement-icon.income {
+      background: var(--income-bg);
+    }
+
+    .movement-icon.expense {
+      background: var(--expense-bg);
+    }
+
+    .movement-info {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .movement-description {
+      font-size: 14px;
+      font-weight: 720;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 4px;
+    }
+
+    .movement-meta {
+      color: var(--muted);
+      font-size: 11px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .movement-right {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex-shrink: 0;
+    }
+
+    .movement-amount {
+      font-size: 14px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .delete-btn {
+      width: 34px;
+      height: 34px;
+      border: none;
+      border-radius: 10px;
+      background: #f8fafc;
+      color: #94a3b8;
+      display: grid;
+      place-items: center;
+      font-size: 16px;
+    }
+
+    .delete-btn:active {
+      background: var(--expense-bg);
+      color: var(--expense);
+    }
+
+    .empty {
+      background: white;
+      border: 1px dashed #cbd5e1;
+      border-radius: var(--radius);
+      padding: 35px 20px;
+      text-align: center;
+    }
+
+    .empty-icon {
+      font-size: 36px;
+      margin-bottom: 8px;
+    }
+
+    .empty-title {
+      font-weight: 750;
+      margin-bottom: 5px;
+    }
+
+    .empty-text {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .footer {
+      text-align: center;
+      color: #94a3b8;
+      font-size: 11px;
+      margin-top: 30px;
+    }
+
+    @media (min-width: 600px) {
+      .app {
+        padding-top: 28px;
+      }
+
+      .summary-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="app">
+
+    <header class="header">
+      <div class="brand">
+        <div class="brand-icon">💰</div>
+        <div>
+          <h1>Controla</h1>
+          <p>Tus finanzas, bajo control.</p>
+        </div>
+      </div>
+    </header>
+
+    <!-- Saldo -->
+    <section class="balance-card">
+      <div class="balance-label">Saldo disponible</div>
+      <div class="balance-value" id="balance">$0.00</div>
+    </section>
+
+    <!-- Totales -->
+    <section class="summary-grid">
+      <div class="summary-card">
+        <div class="summary-top">
+          <div class="summary-icon income">↗</div>
+          <span>Ingresos</span>
+        </div>
+        <div class="summary-value income-text" id="totalIncome">$0.00</div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-top">
+          <div class="summary-icon expense">↘</div>
+          <span>Gastos</span>
+        </div>
+        <div class="summary-value expense-text" id="totalExpense">$0.00</div>
+      </div>
+    </section>
+
+    <!-- Formulario -->
+    <section>
+      <h2 class="section-title">Nuevo movimiento</h2>
+
+      <div class="form-card">
+        <div class="type-selector">
+          <button type="button" class="type-btn income active" id="incomeBtn">
+            ↗ Ingreso
+          </button>
+          <button type="button" class="type-btn expense" id="expenseBtn">
+            ↘ Gasto
+          </button>
+        </div>
+
+        <form id="movementForm" novalidate>
+
+          <div class="field">
+            <label for="description">Descripción</label>
+            <input
+              id="description"
+              type="text"
+              maxlength="100"
+              placeholder="Ej. Sueldo, comida, gasolina..."
+              autocomplete="off"
+            >
+          </div>
+
+          <div class="field">
+            <label for="amount">Cantidad</label>
+            <div class="amount-wrapper">
+              <span class="amount-prefix">$</span>
+              <input
+                id="amount"
+                type="number"
+                inputmode="decimal"
+                min="0.01"
+                step="0.01"
+                placeholder="0.00"
+              >
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="category">Categoría</label>
+            <select id="category">
+              <option value="🍔|Comida">🍔 Comida</option>
+              <option value="🚗|Transporte">🚗 Transporte</option>
+              <option value="🛍️|Compras">🛍️ Compras</option>
+              <option value="💡|Servicios">💡 Servicios</option>
+              <option value="🎮|Entretenimiento">🎮 Entretenimiento</option>
+              <option value="❤️|Salud">❤️ Salud</option>
+              <option value="💼|Trabajo">💼 Trabajo</option>
+              <option value="📦|Otros">📦 Otros</option>
+            </select>
+          </div>
+
+          <div class="error" id="formError"></div>
+
+          <button class="add-btn" type="submit">
+            + Agregar movimiento
+          </button>
+
+        </form>
+      </div>
+    </section>
+
+    <!-- Historial -->
+    <section>
+      <div class="history-header">
+        <h2 class="section-title" style="margin:0;">Historial</h2>
+        <button type="button" class="clear-btn" id="clearBtn">
+          Borrar todos
+        </button>
+      </div>
+
+      <div class="filters">
+        <button type="button" class="filter-btn active" data-filter="all">
+          Todos
+        </button>
+        <button type="button" class="filter-btn" data-filter="income">
+          Ingresos
+        </button>
+        <button type="button" class="filter-btn" data-filter="expense">
+          Gastos
+        </button>
+      </div>
+
+      <div id="movementList" class="movement-list"></div>
+    </section>
+
+    <div class="footer">
+      Controla · Finanzas personales · Datos guardados en tu dispositivo
+    </div>
+
+  </main>
+
+  <script>
+    "use strict";
+
+    /*
+      CONTROLА
+      Gestor de finanzas personales.
+
+      Todo funciona localmente.
+      Los movimientos se almacenan en localStorage.
+    */
+
+    const STORAGE_KEY = "controla_movimientos_v1";
+
+    let movements = [];
+    let currentType = "income";
+    let currentFilter = "all";
+
+    // Elementos de la interfaz
+    const balanceElement = document.getElementById("balance");
+    const totalIncomeElement = document.getElementById("totalIncome");
+    const totalExpenseElement = document.getElementById("totalExpense");
+
+    const movementForm = document.getElementById("movementForm");
+    const descriptionInput = document.getElementById("description");
+    const amountInput = document.getElementById("amount");
+    const categorySelect = document.getElementById("category");
+    const formError = document.getElementById("formError");
+
+    const incomeBtn = document.getElementById("incomeBtn");
+    const expenseBtn = document.getElementById("expenseBtn");
+
+    const movementList = document.getElementById("movementList");
+    const clearBtn = document.getElementById("clearBtn");
+
+    const filterButtons = document.querySelectorAll(".filter-btn");
+
+    // ---------------------------------------------------------
+    // Utilidades
+    // ---------------------------------------------------------
+
+    function formatMoney(value) {
+      const number = Number(value);
+
+      if (!Number.isFinite(number)) {
+        return "$0.00";
+      }
+
+      return new Intl.NumberFormat("es-MX", {
+        style: "currency",
+        currency: "MXN",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }).format(number);
+    }
+
+    function generateId() {
+      return Date.now().toString(36) + "-" +
+        Math.random().toString(36).slice(2, 10);
+    }
+
+    function escapeText(value) {
+      const div = document.createElement("div");
+      div.textContent = String(value);
+      return div.textContent;
+    }
+
+    function showError(message) {
+      formError.textContent = message;
+      formError.classList.add("show");
+    }
+
+    function hideError() {
+      formError.textContent = "";
+      formError.classList.remove("show");
+    }
+
+    function formatDate(dateValue) {
+      const date = new Date(dateValue);
+
+      if (Number.isNaN(date.getTime())) {
+        return "Fecha desconocida";
+      }
+
+      return new Intl.DateTimeFormat("es-MX", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      }).format(date);
+    }
+
+    // ---------------------------------------------------------
+    // LocalStorage
+    // ---------------------------------------------------------
+
+    function saveMovements() {
+      try {
+        localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify(movements)
+        );
+      } catch (error) {
+        console.error("No se pudieron guardar los movimientos:", error);
+      }
+    }
+
+    function loadMovements() {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+
+        if (!stored) {
+          movements = [];
+          return;
+        }
+
+        const parsed = JSON.parse(stored);
+
+        if (!Array.isArray(parsed)) {
+          movements = [];
+          return;
+        }
+
+        movements = parsed.filter(isValidMovement);
+
+      } catch (error) {
+        console.error("No se pudieron cargar los movimientos:", error);
+        movements = [];
+      }
+    }
+
+    function isValidMovement(item) {
+      if (!item || typeof item !== "object") {
+        return false;
+      }
+
+      const validType =
+        item.type === "income" ||
+        item.type === "expense";
+
+      const validDescription =
+        typeof item.description === "string" &&
+        item.description.trim().length > 0;
+
+      const validAmount =
+        Number.isFinite(Number(item.amount)) &&
+        Number(item.amount) > 0;
+
+      const validDate =
+        typeof item.date === "string" &&
+        !Number.isNaN(new Date(item.date).getTime());
+
+      const validCategory =
+        typeof item.category === "string" &&
+        item.category.trim().length > 0;
+
+      return (
+        validType &&
+        validDescription &&
+        validAmount &&
+        validDate &&
+        validCategory
+      );
+    }
+
+    // ---------------------------------------------------------
+    // Tipo de movimiento
+    // ---------------------------------------------------------
+
+    function setMovementType(type) {
+      if (type !== "income" && type !== "expense") {
+        return;
+      }
+
+      currentType = type;
+
+      incomeBtn.classList.toggle(
+        "active",
+        currentType === "income"
+      );
+
+      expenseBtn.classList.toggle(
+        "active",
+        currentType === "expense"
+      );
+
+      hideError();
+    }
+
+    incomeBtn.addEventListener("click", function() {
+      setMovementType("income");
+    });
+
+    expenseBtn.addEventListener("click", function() {
+      setMovementType("expense");
+    });
+
+    // ---------------------------------------------------------
+    // Agregar movimiento
+    // ---------------------------------------------------------
+
+    movementForm.addEventListener("submit", function(event) {
+      event.preventDefault();
+      hideError();
+
+      const description = descriptionInput.value.trim();
+      const amount = Number(amountInput.value);
+      const categoryParts = categorySelect.value.split("|");
+
+      if (!description) {
+        showError("Escribe una descripción para el movimiento.");
+        descriptionInput.focus();
+        return;
+      }
+
+      if (!Number.isFinite(amount) || amount <= 0) {
+        showError("La cantidad debe ser mayor que cero.");
+        amountInput.focus();
+        return;
+      }
+
+      if (amount > 999999999999) {
+        showError("La cantidad introducida es demasiado grande.");
+        amountInput.focus();
+        return;
+      }
+
+      if (
+        categoryParts.length < 2 ||
+        !categoryParts[0] ||
+        !categoryParts[1]
+      ) {
+        showError("Selecciona una categoría válida.");
+        categorySelect.focus();
+        return;
+      }
+
+      const newMovement = {
+        id: generateId(),
+        type: currentType,
+        description: description,
+        amount: Number(amount.toFixed(2)),
+        categoryIcon: categoryParts[0],
+        category: categoryParts[1],
+        date: new Date().toISOString()
+      };
+
+      movements.unshift(newMovement);
+
+      saveMovements();
+      render();
+
+      movementForm.reset();
+
+      // Mantener ingreso como tipo seleccionado después de agregar.
+      setMovementType("income");
+
+      descriptionInput.focus();
+    });
+
+    // ---------------------------------------------------------
+    // Eliminar un movimiento
+    // ---------------------------------------------------------
+
+    function deleteMovement(id) {
+      const movement = movements.find(function(item) {
+        return item.id === id;
+      });
+
+      if (!movement) {
+        return;
+      }
+
+      const confirmation = window.confirm(
+        "¿Quieres eliminar este movimiento?"
+      );
+
+      if (!confirmation) {
+        return;
+      }
+
+      movements = movements.filter(function(item) {
+        return item.id !== id;
+      });
+
+      saveMovements();
+      render();
+    }
+
+    // ---------------------------------------------------------
+    // Borrar todos
+    // ---------------------------------------------------------
+
+    clearBtn.addEventListener("click", function() {
+      if (movements.length === 0) {
+        return;
+      }
+
+      const confirmation = window.confirm(
+        "¿Seguro que quieres borrar TODOS los movimientos?\n\nEsta acción no se puede deshacer."
+      );
+
+      if (!confirmation) {
+        return;
+      }
+
+      movements = [];
+
+      saveMovements();
+      render();
+    });
+
+    // ---------------------------------------------------------
+    // Filtros
+    // ---------------------------------------------------------
+
+    filterButtons.forEach(function(button) {
+      button.addEventListener("click", function() {
+        const filter = button.dataset.filter;
+
+        if (
+          filter !== "all" &&
+          filter !== "income" &&
+          filter !== "expense"
+        ) {
+          return;
+        }
+
+        currentFilter = filter;
+
+        filterButtons.forEach(function(btn) {
+          btn.classList.toggle(
+            "active",
+            btn.dataset.filter === currentFilter
+          );
+        });
+
+        renderHistory();
+      });
+    });
+
+    // ---------------------------------------------------------
+    // Resumen financiero
+    // ---------------------------------------------------------
+
+    function calculateTotals() {
+      let income = 0;
+      let expense = 0;
+
+      movements.forEach(function(movement) {
+        const amount = Number(movement.amount);
+
+        if (!Number.isFinite(amount)) {
+          return;
+        }
+
+        if (movement.type === "income") {
+          income += amount;
+        } else if (movement.type === "expense") {
+          expense += amount;
+        }
+      });
+
+      return {
+        income: income,
+        expense: expense,
+        balance: income - expense
+      };
+    }
+
+    function renderSummary() {
+      const totals = calculateTotals();
+
+      balanceElement.textContent = formatMoney(totals.balance);
+      totalIncomeElement.textContent = formatMoney(totals.income);
+      totalExpenseElement.textContent = formatMoney(totals.expense);
+    }
+
+    // ---------------------------------------------------------
+    // Historial
+    // ---------------------------------------------------------
+
+    function getFilteredMovements() {
+      if (currentFilter === "all") {
+        return movements;
+      }
+
+      return movements.filter(function(movement) {
+        return movement.type === currentFilter;
+      });
+    }
+
+    function renderHistory() {
+      movementList.innerHTML = "";
+
+      const filteredMovements = getFilteredMovements();
+
+      if (filteredMovements.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+
+        const icon = document.createElement("div");
+        icon.className = "empty-icon";
+        icon.textContent = movements.length === 0 ? "📊" : "🔎";
+
+        const title = document.createElement("div");
+        title.className = "empty-title";
+        title.textContent =
+          movements.length === 0
+            ? "Aún no hay movimientos"
+            : "No hay movimientos aquí";
+
+        const text = document.createElement("div");
+        text.className = "empty-text";
+        text.textContent =
+          movements.length === 0
+            ? "Agrega tu primer ingreso o gasto para comenzar a controlar tus finanzas."
+            : "Prueba seleccionando otro filtro.";
+
+        empty.appendChild(icon);
+        empty.appendChild(title);
+        empty.appendChild(text);
+
+        movementList.appendChild(empty);
+        return;
+      }
+
+      filteredMovements.forEach(function(movement) {
+        const article = document.createElement("article");
+        article.className = "movement";
+
+        const icon = document.createElement("div");
+        icon.className =
+          "movement-icon " +
+          (movement.type === "income" ? "income" : "expense");
+
+        icon.textContent =
+          movement.categoryIcon || "📦";
+
+        const info = document.createElement("div");
+        info.className = "movement-info";
+
+        const description = document.createElement("div");
+        description.className = "movement-description";
+        description.textContent =
+          escapeText(movement.description);
+
+        const meta = document.createElement("div");
+        meta.className = "movement-meta";
+        meta.textContent =
+          (movement.category || "Otros") +
+          " · " +
+          formatDate(movement.date);
+
+        info.appendChild(description);
+        info.appendChild(meta);
+
+        const right = document.createElement("div");
+        right.className = "movement-right";
+
+        const amount = document.createElement("div");
+        amount.className =
+          "movement-amount " +
+          (movement.type === "income"
+            ? "income-text"
+            : "expense-text");
+
+        amount.textContent =
+          (movement.type === "income" ? "+" : "-") +
+          formatMoney(movement.amount);
+
+        const deleteButton = document.createElement("button");
+        deleteButton.type = "button";
+        deleteButton.className = "delete-btn";
+        deleteButton.textContent = "🗑️";
+        deleteButton.setAttribute(
+          "aria-label",
+          "Eliminar movimiento"
+        );
+
+        deleteButton.addEventListener("click", function() {
+          deleteMovement(movement.id);
+        });
+
+        right.appendChild(amount);
+        right.appendChild(deleteButton);
+
+        article.appendChild(icon);
+        article.appendChild(info);
+        article.appendChild(right);
+
+        movementList.appendChild(article);
+      });
+    }
+
+    // ---------------------------------------------------------
+    // Render general
+    // ---------------------------------------------------------
+
+    function render() {
+      renderSummary();
+      renderHistory();
+    }
+
+    // ---------------------------------------------------------
+    // Inicialización
+    // ---------------------------------------------------------
+
+    loadMovements();
+    render();
+  </script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+{
+  "appId": "com.finanzas.app",
+  "appName": "Finanzas",
+  "webDir": ".",
+  "bundledWebRuntime": false
+}
